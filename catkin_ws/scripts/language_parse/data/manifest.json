@@ -1,0 +1,35 @@
+{
+  "seed": 42,
+  "grouping": "same ordered canonical direction-object route; explicit issue rewrite families",
+  "label_review": "Rule-screened legacy seeds and deterministic authored labels; human review required before production training",
+  "import": {
+    "original_sha256": "e227d42d000a90ca8147fe3e7f9ae9d31a48d59cdbb7f801ffa05e6648d7eedd",
+    "accepted_seeds": 111,
+    "quarantined_seeds": 24
+  },
+  "split_counts": {
+    "validation": 23,
+    "test": 33,
+    "train": 185
+  },
+  "family_counts": {
+    "validation": 12,
+    "test": 15,
+    "train": 95
+  },
+  "unseen_test_records": 6,
+  "status_counts": {
+    "validation": {
+      "complete": 21,
+      "needs_clarification": 2
+    },
+    "test": {
+      "complete": 27,
+      "needs_clarification": 6
+    },
+    "train": {
+      "complete": 151,
+      "needs_clarification": 34
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "steps", "issues"],
+  "properties": {
+    "status": {"type": "string", "enum": ["complete", "needs_clarification"]},
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["direction", "object", "target_gap_m"],
+        "properties": {
+          "direction": {"type": "string", "enum": ["front", "back", "left", "right"]},
+          "object": {"type": "string", "enum": ["trash", "bench", "billboard", "tree", "tractor trailer", "barrel", "fire hydrant", "traffic cone"]},
+          "target_gap_m": {"type": ["number", "null"], "minimum": 0}
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message"],
+        "properties": {
+          "code": {"type": "string", "enum": ["missing_direction", "missing_object", "unsupported_direction", "unsupported_object", "ambiguous_direction", "ambiguous_object", "ambiguous_gap", "invalid_gap", "no_action"]},
+          "message": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

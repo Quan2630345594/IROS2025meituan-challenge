@@ -1,0 +1,910 @@
+[
+  {
+    "family": "turn-continue",
+    "instructions": [
+      "Move forward to the tree, turn right, then go straight to the fire hydrant",
+      "向前走到树那里，右转后直走到消防栓"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        },
+        {
+          "direction": "right",
+          "object": "fire hydrant",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "en",
+      "zh",
+      "turn_continuation"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "at-to",
+    "instructions": [
+      "Walk forward and turn left at the tree, then continue to the traffic cone",
+      "向前走，在树处左转，然后到交通锥"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        },
+        {
+          "direction": "left",
+          "object": "traffic cone",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "en",
+      "zh",
+      "at_to"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "new-segment",
+    "instructions": [
+      "Go right to the bench, then go straight to the tree",
+      "向右走到长椅，再向前走到树"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "right",
+          "object": "bench",
+          "target_gap_m": null
+        },
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "en",
+      "zh",
+      "new_segment"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "correction",
+    "instructions": [
+      "Turn left, no, turn right to the tree",
+      "左转，不对，右转到树那里"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "right",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "correction",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "negation",
+    "instructions": [
+      "Do not turn left; go right to the tree",
+      "不要向左，向右走到树那里"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "right",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "negation",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "synonym",
+    "instructions": [
+      "Please proceed slowly to the rubbish bin",
+      "请慢慢向前走到垃圾桶"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "trash",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "synonym",
+      "noise",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "alias-hydrant",
+    "instructions": [
+      "Twist left to the fire plug",
+      "向左走到消火栓"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "left",
+          "object": "fire hydrant",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "synonym",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "alias-trailer",
+    "instructions": [
+      "Walk ahead to the big rig",
+      "向前走到牵引挂车"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tractor trailer",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "synonym",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "gap-cm",
+    "instructions": [
+      "Go straight to the tree and stop 50 cm from it",
+      "向前走到树那里，在距离树50厘米的位置停下"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": 0.5
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "gap",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "gap-ft",
+    "instructions": [
+      "Go back to the bench and stop 2 feet away from it",
+      "向后走到长椅，在距离长椅2英尺的位置停下"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "back",
+          "object": "bench",
+          "target_gap_m": 0.6096
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "gap",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "gap-zero",
+    "instructions": [
+      "Go left to the barrel and stop 0 metres from it",
+      "向左走到木桶，在距离木桶0米处停下"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "left",
+          "object": "barrel",
+          "target_gap_m": 0
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "gap",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "gap-multiple",
+    "instructions": [
+      "Go straight to the tree, stopping 1.5 metres from it, then turn right to the fire hydrant and stop 30 cm away",
+      "向前走到距离树1.5米的位置，再向右走到距离消防栓30厘米的位置"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": 1.5
+        },
+        {
+          "direction": "right",
+          "object": "fire hydrant",
+          "target_gap_m": 0.3
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "gap",
+      "multi",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "travel-distance",
+    "instructions": [
+      "Walk forward 2 metres to the tree",
+      "向前走2米到树那里"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "travel_distance",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "spatial-with-action",
+    "instructions": [
+      "Go straight to the tree in front of the billboard",
+      "向前走到广告牌前面的树那里"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "spatial",
+      "en",
+      "zh"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "missing-dir-tree",
+    "instructions": [
+      "Go to the tree",
+      "去树那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "missing_direction",
+          "message": "Specify the movement direction to the tree."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "missing_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "missing-object-right",
+    "instructions": [
+      "Turn right",
+      "向右转"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "missing_object",
+          "message": "Specify the target object after the right turn."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "missing_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "spatial-front-bench",
+    "instructions": [
+      "The bench is in front of the tree",
+      "长椅在树的前面"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "no_action",
+          "message": "Specify a navigation action."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "no_action"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "spatial-target",
+    "instructions": [
+      "Go to the bench in front of the tree",
+      "去树前面的长椅那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "missing_direction",
+          "message": "Specify the movement direction to the bench."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "missing_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "diagonal",
+    "instructions": [
+      "Go diagonally front-left to the tree",
+      "向左前方走到树那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "unsupported_direction",
+          "message": "Only front, back, left and right are supported."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "unsupported_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "bare-seat",
+    "instructions": [
+      "Go forward to the seat",
+      "向前走到座位那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "unsupported_object",
+          "message": "Specify an allowed target object; seat is not necessarily bench."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "unsupported_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "bucket",
+    "instructions": [
+      "Go forward to the bucket",
+      "向前走到水桶那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "unsupported_object",
+          "message": "Bucket is outside the allowed target classes."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "unsupported_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "timber",
+    "instructions": [
+      "Go left to the timber",
+      "向左走到木材那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "unsupported_object",
+          "message": "Timber is outside the allowed target classes."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "unsupported_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "lorry",
+    "instructions": [
+      "Go right to the lorry",
+      "向右走到卡车那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "unsupported_object",
+          "message": "Specify whether the target is a tractor trailer."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "unsupported_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "ambiguous-front",
+    "instructions": [
+      "Go to the front",
+      "去前面"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_direction",
+          "message": "Specify a movement direction and target; front may refer to a location."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "ambiguous_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "incompatible-turns",
+    "instructions": [
+      "Turn left then turn right to the tree",
+      "先左转再右转到树那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_direction",
+          "message": "Specify the target or turning point of the first turn."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "ambiguous_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "object-choice",
+    "instructions": [
+      "Go forward to the tree or the bench",
+      "向前走到树或者长椅那里"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_object",
+          "message": "Choose tree or bench."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "ambiguous_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "gap-unit",
+    "instructions": [
+      "Go forward to the tree and stop 2 away from it",
+      "向前走到树那里，在距离树2的位置停下"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_gap",
+          "message": "Specify the unit of the target separation."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "ambiguous_gap"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "gap-conflict",
+    "instructions": [
+      "Go forward to the tree and stop both 1 metre and 2 metres from it",
+      "向前走到树那里，同时在距离树1米和2米的位置停下"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_gap",
+          "message": "Specify a single target separation."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "ambiguous_gap"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "negative-gap",
+    "instructions": [
+      "Go forward to the tree and stop -1 metres from it",
+      "向前走到树那里，在距离树负1米的位置停下"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "invalid_gap",
+          "message": "Target separation must be nonnegative."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "invalid_gap"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "negated-only",
+    "instructions": [
+      "Do not go left to the bench",
+      "不要向左走到长椅"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "no_action",
+          "message": "Specify a positive navigation action."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "no_action"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "no-action",
+    "instructions": [
+      "Hello, thank you",
+      "你好，谢谢"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "no_action",
+          "message": "Specify a navigation action."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "no_action"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "partial-route",
+    "instructions": [
+      "Go straight to the tree, then turn right",
+      "向前走到树那里，然后右转"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": [
+        {
+          "code": "missing_object",
+          "message": "Specify the target object after the right turn."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "missing_object"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "at-missing-approach",
+    "instructions": [
+      "Turn left at the tree, then go to the traffic cone",
+      "在树处左转，然后到交通锥"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [
+        {
+          "direction": "left",
+          "object": "traffic cone",
+          "target_gap_m": null
+        }
+      ],
+      "issues": [
+        {
+          "code": "missing_direction",
+          "message": "Specify the approach direction to the tree."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "missing_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "conditional",
+    "instructions": [
+      "If the path is clear go left to the tree, otherwise go right to the bench",
+      "如果道路畅通就向左走到树，否则向右走到长椅"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_direction",
+          "message": "Resolve the route condition before choosing a direction."
+        }
+      ]
+    },
+    "tags": [
+      "boundary",
+      "ambiguous_direction"
+    ],
+    "holdout": false
+  },
+  {
+    "family": "unseen-five-step",
+    "instructions": [
+      "Make your way straight ahead until the advertising panel, double back to the cask, take the right-hand route to the park bench, head leftward to the sapling, and finish by going forward to the safety cone.",
+      "先直行至广告牌，再掉头到木桶，右转至长椅，左转到小树，最后前进到交通锥。"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "billboard",
+          "target_gap_m": null
+        },
+        {
+          "direction": "back",
+          "object": "barrel",
+          "target_gap_m": null
+        },
+        {
+          "direction": "right",
+          "object": "bench",
+          "target_gap_m": null
+        },
+        {
+          "direction": "left",
+          "object": "tree",
+          "target_gap_m": null
+        },
+        {
+          "direction": "front",
+          "object": "traffic cone",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "unseen_expression",
+      "en",
+      "zh"
+    ],
+    "holdout": true
+  },
+  {
+    "family": "unseen-at-gap",
+    "instructions": [
+      "Advance to the rubbish bin; pivot right there and approach the big rig, keeping a 75-centimetre separation.",
+      "前进至垃圾桶，以此为转向点右转，到离半挂车75厘米的位置停下。"
+    ],
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "trash",
+          "target_gap_m": null
+        },
+        {
+          "direction": "right",
+          "object": "tractor trailer",
+          "target_gap_m": 0.75
+        }
+      ],
+      "issues": []
+    },
+    "tags": [
+      "unseen_expression",
+      "gap",
+      "at_to",
+      "en",
+      "zh"
+    ],
+    "holdout": true
+  },
+  {
+    "family": "unseen-ambiguous-object",
+    "instructions": [
+      "Head left to whichever one you prefer, the cask or the advertising panel.",
+      "向左走，木桶和广告牌任选一个。"
+    ],
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_object",
+          "message": "Choose barrel or billboard."
+        }
+      ]
+    },
+    "tags": [
+      "unseen_expression",
+      "en",
+      "zh"
+    ],
+    "holdout": true
+  }
+]

@@ -1,0 +1,4 @@
+# Run in a separate Linux/CUDA training environment, not needed for parsing/tests.
+# These scripts target the documented ms-swift 3.5 interface.
+ms-swift==3.5.3
+transformers==4.53.3

@@ -1,0 +1,12 @@
+.local-remote.git/
+__pycache__/
+*.py[cod]
+.venv/
+catkin_ws/build/
+catkin_ws/devel/
+catkin_ws/logs/
+catkin_ws/scripts/language_parse/output/
+catkin_ws/scripts/language_parse/reports/
+*.safetensors
+*.gguf
+*.bin

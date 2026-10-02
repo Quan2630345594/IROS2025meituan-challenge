@@ -1,0 +1,128 @@
+[
+  {
+    "id": "edge-0d7058b9212c6eca",
+    "instruction": "向前走到牵引挂车",
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tractor trailer",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    }
+  },
+  {
+    "id": "edge-ba205ee26ebcf8f2",
+    "instruction": "向右走到长椅，再向前走到树",
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "right",
+          "object": "bench",
+          "target_gap_m": null
+        },
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    }
+  },
+  {
+    "id": "edge-ef369e7e717f0515",
+    "instruction": "向前走，在树处左转，然后到交通锥",
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "front",
+          "object": "tree",
+          "target_gap_m": null
+        },
+        {
+          "direction": "left",
+          "object": "traffic cone",
+          "target_gap_m": null
+        }
+      ],
+      "issues": []
+    }
+  },
+  {
+    "id": "edge-20a9e2f5e7e6e6fe",
+    "instruction": "向左走到木桶，在距离木桶0米处停下",
+    "output": {
+      "status": "complete",
+      "steps": [
+        {
+          "direction": "left",
+          "object": "barrel",
+          "target_gap_m": 0
+        }
+      ],
+      "issues": []
+    }
+  },
+  {
+    "id": "edge-164ab18caae1200d",
+    "instruction": "去树前面的长椅那里",
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "missing_direction",
+          "message": "Specify the movement direction to the bench."
+        }
+      ]
+    }
+  },
+  {
+    "id": "edge-23fdb2d7541cfe09",
+    "instruction": "向右转",
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "missing_object",
+          "message": "Specify the target object after the right turn."
+        }
+      ]
+    }
+  },
+  {
+    "id": "edge-1e0fdebced4918ac",
+    "instruction": "If the path is clear go left to the tree, otherwise go right to the bench",
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "ambiguous_direction",
+          "message": "Resolve the route condition before choosing a direction."
+        }
+      ]
+    }
+  },
+  {
+    "id": "edge-193c0aa1cb508a5b",
+    "instruction": "向前走到座位那里",
+    "output": {
+      "status": "needs_clarification",
+      "steps": [],
+      "issues": [
+        {
+          "code": "unsupported_object",
+          "message": "Specify an allowed target object; seat is not necessarily bench."
+        }
+      ]
+    }
+  }
+]
