@@ -150,4 +150,4 @@ python evaluate.py --predictions reports/schema.predictions.jsonl --mode schema
 
 ## 本地 Git
 
-项目根目录的工作分支为 `feature/language-parse-json-lora`；origin 指向项目内的 `.local-remote.git` 裸仓库。远端的 main 和同名 feature 分支只含共同的空初始化提交，代码实现提交只在本地工作分支。没有执行 push，没有创建网络仓库。裸远端目录、训练权重、输出和评估报告均已加入 `.gitignore`。
+项目根目录的工作分支为 `feature/language-parse-json-lora`；origin 指向 GitHub 公开仓库 [Quan2630345594/IROS2025meituan-challenge](https://github.com/Quan2630345594/IROS2025meituan-challenge)。GitHub 仓库保持为空，没有执行 push，尚未建立 GitHub 上的分支或设置其上游。原本地裸仓库 `.local-remote.git` 保留为 local-origin。裸远端目录、训练权重、输出和评估报告均已加入 `.gitignore`。
