@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>goal_detection</name>
+  <version>0.1.0</version>
+  <description>Staged single-camera LiDAR BEV feature fusion perception.</description>
+  <maintainer email="user@todo.todo">project maintainer</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>cv_bridge</depend>
+  <depend>message_filters</depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>rospkg</exec_depend>
+</package>

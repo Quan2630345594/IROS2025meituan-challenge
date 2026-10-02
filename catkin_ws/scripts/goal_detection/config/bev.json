@@ -1,0 +1,11 @@
+{
+  "grid": {"x_min": 0.0, "x_max": 50.0, "y_min": -25.0, "y_max": 25.0, "resolution": 0.1},
+  "classes": ["person", "car", "bicycle", "motorcycle", "fire_hydrant", "trash_bin", "traffic_sign", "traffic_cone", "bollard", "street_light", "bench", "pole", "box", "other_infrastructure"],
+  "semantic_classes": ["road", "sidewalk", "grass", "building", "obstacle", "unknown"],
+  "occupancy_classes": ["free", "occupied", "unknown"],
+  "channels": 64,
+  "image_normalization": "RGB float32 [0,1]",
+  "camera_convention": "optical: x right, y down, z forward",
+  "robot_convention": "x forward, y left, z up",
+  "box_regression": ["offset_x", "offset_y", "center_z", "log_length", "log_width", "log_height", "sin_yaw", "cos_yaw"]
+}
