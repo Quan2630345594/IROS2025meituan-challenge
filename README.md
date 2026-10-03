@@ -74,18 +74,6 @@ python3 parse_goal_direction.py '向前走到距离树50厘米的位置'
 
 使用 `--model` 或 `LANGUAGE_PARSE_MODEL` 切换模型，使用 `--base-url` 或 `OLLAMA_BASE_URL` 配置 Ollama 地址，默认地址为 `http://localhost:11434`。成功退出码为 `0`，待澄清为 `2`，请求或输出格式失败为 `1`。
 
-Python 集成使用结构化接口，在 `language_parse` 目录或已将该目录加入 Python 搜索路径的环境中运行：
-
-```python
-from parse_goal_direction import parse_instruction
-
-result = parse_instruction("向前走到树那里")
-if result["status"] == "complete":
-    steps = result["steps"]  # 交给上层导航系统
-else:
-    issues = result["issues"]  # 根据问题向用户澄清
-```
-
 ### 数据、LoRA 训练与评估
 
 当前数据共 241 条，train / validation / test 分别为 185 / 23 / 33 条，使用随机种子 42，按改写族隔离。同一路线的中英文改写与不同间隔样本归为同族，以减少跨集合泄漏。标签来自规则筛选和手写模板，属于小规模起始数据，正式训练前仍需人工语义审查。
@@ -125,10 +113,6 @@ python3 parse_goal_direction.py '向前走到树那里' --backend openai --base-
 python3 evaluate.py --mode schema --model qwen2.5vl:7b
 python3 evaluate.py --mode lora-schema --backend openai --base-url http://localhost:8000/v1 --model navigation-lora
 ```
-
-报告统计完整序列、方向、物体、间隔、步骤顺序、状态与澄清问题码，并区分中英文及未见表达子集。判断 LoRA 增益时应统一基座来源、后端与精度。实际 LoRA 训练和两组模型评估尚未执行。
-
-完整规则与部署细节见 [指令解析说明](catkin_ws/scripts/language_parse/README.md)。
 
 ## 第二部分：单目 RGB + LiDAR BEV 融合感知
 
