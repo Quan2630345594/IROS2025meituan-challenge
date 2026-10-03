@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Import the old examples without executing their code; build grouped SFT splits."""
+"""Build grouped SFT splits from saved structured annotations."""
 
 import argparse
-import ast
 from collections import Counter, defaultdict
 import hashlib
 import json
@@ -12,10 +11,8 @@ from pathlib import Path
 
 if __package__:
     from .contract import ROOT, DIRECTIONS, OBJECTS, system_prompt, validate_result
-    from .parse_goal_direction import from_legacy
 else:
     from contract import ROOT, DIRECTIONS, OBJECTS, system_prompt, validate_result
-    from parse_goal_direction import from_legacy
 
 
 def digest(value):
@@ -27,25 +24,6 @@ def route_family(output):
     return "route-" + digest(json.dumps([(s["direction"], s["object"]) for s in output["steps"]]))
 
 
-def extract_prompt(source):
-    tree = ast.parse(source)
-    function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "parse_goal_direction")
-    for node in ast.walk(function):
-        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "prompt" for t in node.targets):
-            if not isinstance(node.value, ast.JoinedStr):
-                raise ValueError("expected original f-string prompt")
-            parts = []
-            for value in node.value.values:
-                if isinstance(value, ast.Constant) and isinstance(value.value, str):
-                    parts.append(value.value)
-                elif isinstance(value, ast.FormattedValue) and isinstance(value.value, ast.Name) and value.value.id == "language_instr":
-                    parts.append("{language_instr}")
-                else:
-                    raise ValueError("unrecognized original prompt interpolation")
-            return "".join(parts)
-    raise ValueError("original prompt not found")
-
-
 def write_jsonl(path, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
@@ -53,54 +31,6 @@ def write_jsonl(path, rows):
 
 def read_jsonl(path):
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-
-
-def import_original(source):
-    prompt = extract_prompt(source)
-    (ROOT / "reference").mkdir(exist_ok=True)
-    snapshot = "\n".join(line.rstrip() for line in prompt.splitlines()).rstrip() + "\n"
-    (ROOT / "reference" / "legacy_prompt.txt").write_text(snapshot, encoding="utf-8")
-    accepted, rejected, seen = [], [], set()
-    section = ""
-    # These aliases are intentionally NOT silently re-labelled under the new taxonomy.
-    broad = re.compile(r"\b(timber|shrub|bush|bucket|vat|drum|seat|lorry|truck|signboard|pylon|cone|traffic pyramid)\b", re.I)
-    for line in prompt.splitlines():
-        if line.strip().startswith("##"):
-            section = line.strip()
-        match = re.match(r'^\s*(\d+)\.\s*(.+?)\s*(?:→|->)\s*(".+)\s*$', line)
-        if not match:
-            continue
-        number, instruction, labels = match.groups()
-        labels = re.sub(r'"\s+([^"\n]+)"', r'"\1"', labels)
-        row = {"instruction": instruction.strip(), "section": section, "number": int(number), "legacy_label": labels.strip()}
-        reason = None
-        # Match conservative exclusions after removing the allowed road/safety/traffic cone phrases.
-        checked = re.sub(r"\b(?:traffic|road|safety) cone\b", "", instruction, flags=re.I)
-        if broad.search(checked):
-            reason = "旧示例使用了已移除的过宽物体映射，需人工重标"
-        if re.search(r"\b(?:walk|go|move|reach)(?: to| the)\b", instruction, re.I):
-            reason = "旧示例把无方向移动补成 front；新规则需明确方向或待澄清"
-        normalized = " ".join(instruction.casefold().split())
-        if normalized in seen:
-            reason = "原句大小写/空白重复，已去重"
-        seen.add(normalized)
-        try:
-            output = from_legacy(row["legacy_label"])
-        except ValueError as exc:
-            reason = "无效旧标签: " + str(exc)
-        if reason:
-            rejected.append({**row, "reason": reason})
-        else:
-            accepted.append({"id": "old-" + digest(normalized), "family_id": route_family(output),
-                             "instruction": row["instruction"], "output": output,
-                             "tags": ["legacy_seed", "en", "at_to" if '"at"' in section else "route"],
-                             "source": {"section": section, "number": int(number)}})
-    if not accepted:
-        raise ValueError("no usable original examples found")
-    write_jsonl(ROOT / "data" / "seed_records.jsonl", accepted)
-    write_jsonl(ROOT / "data" / "seed_quarantine.jsonl", rejected)
-    return {"original_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-            "accepted_seeds": len(accepted), "quarantined_seeds": len(rejected)}
 
 
 def generated_records():
@@ -128,8 +58,8 @@ def generated_records():
     return records
 
 
-def build(source=None, seed=42):
-    metadata = import_original(source.read_text(encoding="utf-8-sig")) if source else json.loads(
+def build(seed=42):
+    metadata = json.loads(
         (ROOT / "data" / "manifest.json").read_text(encoding="utf-8"))["import"]
     candidates = read_jsonl(ROOT / "data" / "seed_records.jsonl") + generated_records()
     groups, seen = defaultdict(list), {}
@@ -196,7 +126,6 @@ def build(source=None, seed=42):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, help="Original script, read as AST without importing/executing it")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    print(json.dumps(build(args.source, args.seed), ensure_ascii=False, indent=2))
+    print(json.dumps(build(args.seed), ensure_ascii=False, indent=2))

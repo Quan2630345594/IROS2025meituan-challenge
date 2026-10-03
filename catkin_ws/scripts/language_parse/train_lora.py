@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -19,15 +20,15 @@ else:
 def build_command(config, model=None, output_dir=None):
     config = dict(config)
     if model:
-        config["model"] = model
+        config["model"] = Path(os.path.relpath(model, ROOT)).as_posix() if Path(model).exists() else model
     command = ["swift", "sft"]
     for name, value in config.items():
         command.append("--" + name)
         command.append(str(value).lower() if isinstance(value, bool) else str(value))
-    command.extend(["--dataset", str(ROOT / "data" / "train.jsonl"),
-                    "--val_dataset", str(ROOT / "data" / "validation.jsonl"),
-                    "--output_dir", str(output_dir or ROOT / "output" / "qwen2.5vl-navigation"),
-                    "--external_plugins", str(ROOT / "training" / "early_stop.py")])
+    command.extend(["--dataset", "data/train.jsonl",
+                    "--val_dataset", "data/validation.jsonl",
+                    "--output_dir", "output/qwen2.5vl-navigation" if output_dir is None else Path(os.path.relpath(output_dir, ROOT)).as_posix(),
+                    "--external_plugins", "training/early_stop.py"])
     return command
 
 

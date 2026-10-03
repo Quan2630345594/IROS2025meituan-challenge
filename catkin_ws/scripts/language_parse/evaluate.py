@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-"""Run original/schema/LoRA-schema baselines or score previously saved predictions."""
+"""Run schema/LoRA-schema baselines or score previously saved predictions."""
 
 import argparse
 from collections import Counter
 import json
+import os
 from pathlib import Path
 import sys
 
 if __package__:
     from .build_dataset import read_jsonl, write_jsonl
     from .contract import ROOT, load_result, validate_result
-    from .parse_goal_direction import chat, from_legacy, parse_instruction
+    from .parse_goal_direction import parse_instruction
 else:
     from build_dataset import read_jsonl, write_jsonl
     from contract import ROOT, load_result, validate_result
-    from parse_goal_direction import chat, from_legacy, parse_instruction
+    from parse_goal_direction import parse_instruction
 
 
 def issue_codes(result):
@@ -98,20 +99,11 @@ def score(records, predictions):
 
 def run(records, mode, model, base_url, timeout, few_shot, backend="ollama"):
     predictions = []
-    prompt = (ROOT / "reference" / "legacy_prompt.txt").read_text(encoding="utf-8") if mode == "original" else None
     for index, row in enumerate(records, 1):
         prediction = {"id": row["id"], "model": model, "mode": mode, "output": None}
         try:
-            if mode == "original":
-                # Reproduce the original prompt/temperature/limit, but only one call.
-                raw = chat([{"role": "user", "content": prompt.replace("{language_instr}", row["instruction"])}], backend=backend,
-                                  model=model, base_url=base_url, timeout=timeout, temperature=0.1,
-                                  num_predict=3000, num_ctx=16384)
-                prediction["raw"] = raw
-                prediction["output"] = from_legacy(raw)
-            else:
-                prediction["output"] = parse_instruction(row["instruction"], model=model, base_url=base_url,
-                                                         timeout=timeout, few_shot=few_shot, backend=backend)
+            prediction["output"] = parse_instruction(row["instruction"], model=model, base_url=base_url,
+                                                     timeout=timeout, few_shot=few_shot, backend=backend)
         except (ValueError, RuntimeError) as exc:
             prediction["error"] = str(exc)
         predictions.append(prediction)
@@ -129,14 +121,13 @@ def report(records, predictions):
         if subset:
             ids = {r["id"] for r in subset}
             result[name] = score(subset, [p for p in predictions if p["id"] in ids])
-    result["legacy_seed_samples_in_original_prompt"] = sum("legacy_seed" in r["tags"] for r in records)
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, default=ROOT / "data" / "test.records.jsonl")
-    parser.add_argument("--mode", choices=["original", "schema", "lora-schema"], default="schema")
+    parser.add_argument("--mode", choices=["schema", "lora-schema"], default="schema")
     parser.add_argument("--model", default="qwen2.5vl:7b", help="For lora-schema, supply the deployed LoRA model name")
     parser.add_argument("--base-url")
     parser.add_argument("--backend", choices=["ollama", "openai"], default="ollama")
@@ -151,8 +142,8 @@ def main():
     predictions = read_jsonl(args.predictions) if args.predictions else run(
         rows, args.mode, args.model, args.base_url, args.timeout, not args.no_few_shot, args.backend)
     result = {"mode": args.mode, "model": args.model, "backend": args.backend,
-              "few_shot": False if args.mode == "original" else not args.no_few_shot,
-              "dataset": str(args.dataset.resolve()), "metrics": report(rows, predictions)}
+              "few_shot": not args.no_few_shot,
+              "dataset": os.path.relpath(args.dataset, Path.cwd()), "metrics": report(rows, predictions)}
     args.output_dir.mkdir(parents=True, exist_ok=True)
     if not args.predictions:
         write_jsonl(args.output_dir / (args.mode + ".predictions.jsonl"), predictions)

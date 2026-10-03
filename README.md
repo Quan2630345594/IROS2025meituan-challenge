@@ -11,7 +11,7 @@
 ```text
 catkin_ws/scripts/
 ├── language_parse/
-│   ├── parse_goal_direction.py   推理与旧接口兼容
+│   ├── parse_goal_direction.py   结构化 JSON 推理
 │   ├── contract.py / schema.json 词表、输出契约与校验
 │   ├── system_prompt.txt         解析规则
 │   ├── build_dataset.py          数据构建与分组划分
@@ -65,16 +65,16 @@ catkin_ws/scripts/
 
 解析、数据处理和离线测试仅依赖 Python 3.8+ 标准库。模型推理需要已安装并启动的 Ollama 服务及对应模型。从仓库根目录执行：
 
-```powershell
+```bash
 cd catkin_ws/scripts/language_parse
 ollama pull qwen2.5vl:7b
-python parse_goal_direction.py '向前走到树那里，右转后直走到消防栓'
-python parse_goal_direction.py '向前走到距离树50厘米的位置'
+python3 parse_goal_direction.py '向前走到树那里，右转后直走到消防栓'
+python3 parse_goal_direction.py '向前走到距离树50厘米的位置'
 ```
 
 使用 `--model` 或 `LANGUAGE_PARSE_MODEL` 切换模型，使用 `--base-url` 或 `OLLAMA_BASE_URL` 配置 Ollama 地址，默认地址为 `http://localhost:11434`。成功退出码为 `0`，待澄清为 `2`，请求或输出格式失败为 `1`。
 
-旧调用方可添加 `--legacy` 输出方向与物体的字符串序列，但会丢弃目标间隔。Python 集成建议使用结构化接口，在 `language_parse` 目录或已将该目录加入 Python 搜索路径的环境中运行：
+Python 集成使用结构化接口，在 `language_parse` 目录或已将该目录加入 Python 搜索路径的环境中运行：
 
 ```python
 from parse_goal_direction import parse_instruction
@@ -93,10 +93,10 @@ else:
 在 `language_parse` 目录检查数据与离线逻辑：
 
 ```bash
-python check_dataset.py
-python -m unittest discover -s tests -v
+python3 check_dataset.py
+python3 -m unittest discover -s tests -v
 # 修改规则或别名后重建，再运行检查
-python build_dataset.py
+python3 build_dataset.py
 ```
 
 LoRA 基座为 `Qwen/Qwen2.5-VL-7B-Instruct`，采用 rank=8、alpha=32、学习率 1e-4、最多 3 轮，仅训练语言部分 LoRA，冻结视觉模块与对齐模块。训练只监督最终 assistant JSON，按验证 loss 选择最佳 checkpoint，并执行早停。配置见 `training/lora_config.json`。
@@ -105,29 +105,28 @@ LoRA 基座为 `Qwen/Qwen2.5-VL-7B-Instruct`，采用 rank=8、alpha=32、学习
 
 ```bash
 cd catkin_ws/scripts/language_parse
-python -m pip install -r requirements-training.txt
-python check_dataset.py
-python train_lora.py         # 检查并打印参数
-python train_lora.py --run   # 实际启动训练
+python3 -m pip install -r requirements-training.txt
+python3 check_dataset.py
+python3 train_lora.py         # 检查并打印参数
+python3 train_lora.py --run   # 实际启动训练
 ```
 
-训练后可合并适配器，再用支持该模型和 JSON Schema 输出的 vLLM 服务部署。Ollama 模型包不能直接作为训练权重，适配器也不能假定可直接导入 Ollama。以下路径需替换为实际 checkpoint 和合并结果；vLLM 建议安装在独立服务环境：
+训练后可合并适配器，再用支持该模型和 JSON Schema 输出的 vLLM 服务部署。Ollama 模型包不能直接作为训练权重，适配器也不能假定可直接导入 Ollama。以下相对路径需替换为实际 checkpoint 和合并结果；vLLM 建议安装在独立服务环境：
 
 ```bash
-swift export --adapters /path/to/best/checkpoint --merge_lora true
-vllm serve /path/to/merged/model --served-model-name navigation-lora --max-model-len 8192
-python parse_goal_direction.py '向前走到树那里' --backend openai --base-url http://localhost:8000/v1 --model navigation-lora --no-few-shot
+swift export --adapters output/qwen2.5vl-navigation/checkpoint-best --merge_lora true
+vllm serve output/qwen2.5vl-navigation/merged --served-model-name navigation-lora --max-model-len 8192
+python3 parse_goal_direction.py '向前走到树那里' --backend openai --base-url http://localhost:8000/v1 --model navigation-lora --no-few-shot
 ```
 
-评估入口提供原始提示词、Schema 基座和 LoRA + Schema 三组对比：
+评估入口提供Schema 基座和 LoRA + Schema 两组对比：
 
 ```bash
-python evaluate.py --mode original --model qwen2.5vl:7b
-python evaluate.py --mode schema --model qwen2.5vl:7b
-python evaluate.py --mode lora-schema --backend openai --base-url http://localhost:8000/v1 --model navigation-lora
+python3 evaluate.py --mode schema --model qwen2.5vl:7b
+python3 evaluate.py --mode lora-schema --backend openai --base-url http://localhost:8000/v1 --model navigation-lora
 ```
 
-报告统计完整序列、方向、物体、间隔、步骤顺序、状态与澄清问题码，并区分中英文及未见表达子集。判断 LoRA 增益时应统一基座来源、后端与精度。实际 LoRA 训练和三组模型评估尚未执行。
+报告统计完整序列、方向、物体、间隔、步骤顺序、状态与澄清问题码，并区分中英文及未见表达子集。判断 LoRA 增益时应统一基座来源、后端与精度。实际 LoRA 训练和两组模型评估尚未执行。
 
 完整规则与部署细节见 [指令解析说明](catkin_ws/scripts/language_parse/README.md)。
 
@@ -153,10 +152,10 @@ python evaluate.py --mode lora-schema --backend openai --base-url http://localho
 
 ```bash
 cd catkin_ws/scripts/goal_detection
-python -m pip install numpy
-python -m unittest discover -s tests -v
+python3 -m pip install numpy
+python3 -m unittest discover -s tests -v
 # 需要网络前向时安装完整依赖
-python -m pip install -r requirements-bev.txt
+python3 -m pip install -r requirements-bev.txt
 ```
 
 自行准备 `frame.npz`，包含以下数组，禁止使用 object dtype：
@@ -171,21 +170,21 @@ python -m pip install -r requirements-bev.txt
 
 ```bash
 # 保存 pillar 特征、原始点索引、像素坐标与 BEV 行列索引
-python -m bev.cli --input frame.npz --output outputs/features.npz
+python3 -m bev.cli --input frame.npz --output outputs/features.npz
 # 额外保存随机初始化网络的原始任务头、融合特征与有效掩码
-python -m bev.cli --input frame.npz --output outputs/raw_heads.npz --forward
+python3 -m bev.cli --input frame.npz --output outputs/raw_heads.npz --forward
 ```
 
-`--forward` 仅验证张量形状与数据流，不产生可用检测结果。可通过 `--config /path/to/bev.json` 指定自定义配置；默认网格较大，CPU 验证可以缩小网格范围。
+`--forward` 仅验证张量形状与数据流，不产生可用检测结果。可通过 `--config config/custom_bev.json` 指定自定义配置；默认网格较大，CPU 验证可以缩小网格范围。
 
 ### ROS1 几何诊断
 
-使用 Linux / ROS Noetic。代码位于 `catkin_ws/scripts`，catkin 不会自动将其识别为 `src` 包，需要链接到 ROS 工作空间。替换下面的仓库路径后运行：
+使用 Linux / ROS Noetic。代码位于 `catkin_ws/scripts`，catkin 不会自动将其识别为 `src` 包，需要链接到 ROS 工作空间。从仓库根目录运行：
 
 ```bash
-mkdir -p ~/bev_ws/src
-ln -s /path/to/IROS-MEITUAN-CHALLENGE/catkin_ws/scripts/goal_detection ~/bev_ws/src/goal_detection
-cd ~/bev_ws
+mkdir -p catkin_ws/src
+ln -s ../scripts/goal_detection catkin_ws/src/goal_detection
+cd catkin_ws
 rosdep install --from-paths src --ignore-src -r -y
 chmod +x src/goal_detection/scripts/bev_features_node.py
 catkin_make

@@ -15,9 +15,8 @@ from build_dataset import read_jsonl
 from check_dataset import check
 from contract import ParseValidationError, get_schema, load_result, validate_result
 from evaluate import score
-from parse_goal_direction import (ClarificationRequired, InferenceError, build_messages, from_legacy,
-                                  ollama_chat, openai_chat, parse_goal_direction, parse_instruction,
-                                  standardize_output, to_legacy, validate_direction)
+from parse_goal_direction import (InferenceError, build_messages, ollama_chat,
+                                  openai_chat, parse_instruction)
 from train_lora import build_command
 
 
@@ -34,24 +33,6 @@ def fake_response(result=None, **changes):
 
 
 class ContractTests(unittest.TestCase):
-    def test_old_round_trip_keeps_multiword_classes(self):
-        old = to_legacy(good())
-        self.assertEqual(old, '"front", "tree", "right", "fire hydrant"')
-        self.assertTrue(validate_direction(old))
-        self.assertEqual(from_legacy(old)["steps"][1]["object"], "fire hydrant")
-        self.assertIsNone(from_legacy(old)["steps"][1]["target_gap_m"])
-
-    def test_single_front_empty_odd_unquoted_or_wrong_order_rejected(self):
-        for value in ('"front"', '', '"front", "tree", "right"', 'front, tree', '"tree", "front"',
-                      '"front", "bucket"', '"left front", "tree"', None):
-            with self.subTest(value=value):
-                self.assertFalse(validate_direction(value))
-
-    def test_standardize_handles_spacing_without_guessing_words(self):
-        self.assertEqual(standardize_output(' "front","tractor trailer" '), '"front", "tractor trailer"')
-        with self.assertRaises(ValueError):
-            standardize_output('"front", "tractortrailer"')
-
     def test_gaps_reject_bool_string_negative_nonfinite(self):
         for value in (True, "0.5", -1, float("nan"), float("inf")):
             result = good()
@@ -74,15 +55,6 @@ class ContractTests(unittest.TestCase):
         for result in variants:
             with self.subTest(result=result), self.assertRaises(ParseValidationError):
                 validate_result(result)
-
-    def test_partial_route_cannot_be_executed_through_legacy(self):
-        result = good()
-        result["status"] = "needs_clarification"
-        result["issues"] = [{"code": "missing_object", "message": "Specify final target."}]
-        validate_result(result)
-        with self.assertRaises(ClarificationRequired) as caught:
-            to_legacy(result)
-        self.assertIs(caught.exception.result, result)
 
     def test_duplicate_json_keys_codefences_and_nan_rejected(self):
         for text in ('{"status":"complete","status":"needs_clarification","steps":[],"issues":[]}',
@@ -110,12 +82,6 @@ class TransportTests(unittest.TestCase):
         self.assertEqual(body["options"]["temperature"], 0)
         self.assertFalse(body["stream"])
         self.assertEqual(body["messages"][-1]["role"], "user")
-
-    @patch("parse_goal_direction.urlopen")
-    def test_original_api(self, request):
-        request.return_value = fake_response()
-        self.assertEqual(parse_goal_direction("front to tree right to hydrant", few_shot=False),
-                         '"front", "tree", "right", "fire hydrant"')
 
     @patch("parse_goal_direction.urlopen")
     def test_openai_json_schema_deployment(self, request):
@@ -208,6 +174,9 @@ class DataAndEvaluationTests(unittest.TestCase):
     def test_training_command_uses_explicit_validation_no_test(self):
         config = json.loads((ROOT / "training" / "lora_config.json").read_text(encoding="utf-8"))
         command = build_command(config)
+        self.assertEqual(command[command.index("--dataset") + 1], "data/train.jsonl")
+        self.assertEqual(command[command.index("--external_plugins") + 1], "training/early_stop.py")
+        self.assertEqual(command[command.index("--output_dir") + 1], "output/qwen2.5vl-navigation")
         self.assertIn("--val_dataset", command)
         self.assertIn("--external_plugins", command)
         self.assertNotIn("--callbacks", command)

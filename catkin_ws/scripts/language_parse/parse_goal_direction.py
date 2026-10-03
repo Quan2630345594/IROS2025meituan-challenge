@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ollama JSON-schema parsing with a compatible alternating-string interface."""
+"""Structured navigation parsing using JSON Schema."""
 
 import argparse
 import json
@@ -10,19 +10,13 @@ from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 if __package__:
-    from .contract import ROOT, DIRECTIONS, OBJECTS, ParseValidationError, get_schema, load_result, system_prompt, validate_result
+    from .contract import ROOT, get_schema, load_result, system_prompt, validate_result
 else:
-    from contract import ROOT, DIRECTIONS, OBJECTS, ParseValidationError, get_schema, load_result, system_prompt, validate_result
+    from contract import ROOT, get_schema, load_result, system_prompt, validate_result
 
 
 class InferenceError(RuntimeError):
     """Ollama is unavailable, returned an error, or truncated its output."""
-
-
-class ClarificationRequired(ValueError):
-    def __init__(self, result):
-        self.result = result
-        super().__init__("; ".join(issue["message"] for issue in result["issues"]))
 
 
 def _endpoint(base_url):
@@ -147,62 +141,6 @@ def parse_instruction(language_instr, *, model=None, base_url=None, timeout=120,
     return load_result(text)
 
 
-def to_legacy(result):
-    """Convert only complete sequences. The legacy interface cannot represent gaps."""
-    validate_result(result)
-    if result["status"] != "complete":
-        raise ClarificationRequired(result)
-    # Serialize labels individually: multiword classes remain atomic.
-    return ", ".join(json.dumps(label) for step in result["steps"]
-                     for label in (step["direction"], step["object"]))
-
-
-def from_legacy(text):
-    if not isinstance(text, str) or not text.strip():
-        raise ParseValidationError("legacy output must be nonempty")
-    try:
-        labels = json.loads("[" + text + "]")
-    except json.JSONDecodeError as exc:
-        raise ParseValidationError("legacy output requires quoted comma-separated labels") from exc
-    if not labels or len(labels) % 2:
-        raise ParseValidationError("legacy output requires a nonzero even number of labels")
-    return validate_result({"status": "complete", "steps": [
-        {"direction": labels[i], "object": labels[i + 1], "target_gap_m": None}
-        for i in range(0, len(labels), 2)], "issues": []})
-
-
-def validate_direction(direction):
-    try:
-        from_legacy(direction)
-        return True
-    except (ValueError, TypeError):
-        return False
-
-
-def standardize_output(text):
-    """Compatibility helper; validate quoted labels without guessing word boundaries."""
-    return to_legacy(from_legacy(text))
-
-
-def parse_goal_direction(language_instr, **kwargs):
-    """Original API: alternating quoted labels; ambiguity raises ClarificationRequired.
-
-    For target gaps, use parse_instruction(), since this API discards gap fields.
-    """
-    return to_legacy(parse_instruction(language_instr, **kwargs))
-
-
-def analyze_sample_coverage():
-    from collections import Counter
-    counts = Counter()
-    records = (ROOT / "data" / "train.records.jsonl").read_text(encoding="utf-8").splitlines()
-    for line in records:
-        for step in json.loads(line)["output"]["steps"]:
-            counts[step["direction"]] += 1
-            counts[step["object"]] += 1
-    return {**{label: counts[label] for label in DIRECTIONS + OBJECTS}, "total": len(records)}
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("instruction")
@@ -211,16 +149,12 @@ def main():
     parser.add_argument("--backend", choices=["ollama", "openai"], default="ollama")
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--no-few-shot", action="store_true", help="Use for the LoRA model trained on the same system prompt")
-    parser.add_argument("--legacy", action="store_true", help="Discard target gaps and emit original interface")
     args = parser.parse_args()
     try:
         result = parse_instruction(args.instruction, model=args.model, base_url=args.base_url,
                                    timeout=args.timeout, few_shot=not args.no_few_shot, backend=args.backend)
-        print(to_legacy(result) if args.legacy else json.dumps(result, ensure_ascii=False, indent=2))
+        print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["status"] == "complete" else 2
-    except ClarificationRequired as exc:
-        print(json.dumps(exc.result, ensure_ascii=False, indent=2))
-        return 2
     except (ValueError, InferenceError) as exc:
         print(str(exc), file=sys.stderr)
         return 1

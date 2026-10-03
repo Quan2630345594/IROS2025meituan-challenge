@@ -29,13 +29,13 @@ launch/decision.launch    新方案启动入口
 tests/                    几何与融合验证
 ```
 
-## 离线使用（Windows / Linux）
+## 离线使用（Ubuntu）
 
 进入本目录后执行：
 
 ```bash
-python -m pip install numpy
-python -m unittest discover -s tests -v
+python3 -m pip install numpy
+python3 -m unittest discover -s tests -v
 ```
 
 安装与你的 Python / CUDA 环境相匹配的 PyTorch 后，才能验证网络前向；依赖列表为 `requirements-bev.txt`。ROS Noetic 常用 Python 3.8，与较新 PyTorch 的 Python 支持需要分别确认，建议离线研究与 ROS 诊断使用独立环境。
@@ -51,20 +51,20 @@ python -m unittest discover -s tests -v
 | `T_robot_lidar` | `4×4`，LiDAR → 机器人 |
 
 ```bash
-python -m bev.cli --input frame.npz --output outputs/features.npz
-python -m bev.cli --input frame.npz --output outputs/raw_heads.npz --forward
+python3 -m bev.cli --input frame.npz --output outputs/features.npz
+python3 -m bev.cli --input frame.npz --output outputs/raw_heads.npz --forward
 ```
 
 第一条产生 pillar 特征与对应索引；第二条额外产生**随机初始化**网络的 raw logits / box regression，只用于形状和数据流检查，不代表检测结果。默认大网格网络前向较慢，CPU 验证可另建配置，将 x/y 范围缩小到各 8m；不要改变真实数据的坐标单位。
 
 ## ROS1 使用（Linux / ROS Noetic）
 
-此目录放在 `catkin_ws/scripts`，catkin 不会自动把它当作 `src` 包。部署时将本目录软链接到你的 ROS workspace `src`，例如仓库位于 `/path/to/IROS-MEITUAN-CHALLENGE`：
+此目录放在 `catkin_ws/scripts`，catkin 不会自动把它当作 `src` 包。从仓库根目录创建相对软链接：
 
 ```bash
-mkdir -p ~/bev_ws/src
-ln -s /path/to/IROS-MEITUAN-CHALLENGE/catkin_ws/scripts/goal_detection ~/bev_ws/src/goal_detection
-cd ~/bev_ws
+mkdir -p catkin_ws/src
+ln -s ../scripts/goal_detection catkin_ws/src/goal_detection
+cd catkin_ws
 rosdep install --from-paths src --ignore-src -r -y
 chmod +x src/goal_detection/scripts/bev_features_node.py
 catkin_make
