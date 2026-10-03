@@ -1,6 +1,6 @@
 > **代码范围说明：本仓库代码只包括 solution 的两部分内容：①结构化导航指令解析；②单目 RGB + LiDAR BEV 融合感知。不包含完整的导航决策、路径规划、运动控制或比赛部署系统。**
 
-# IROS 美团挑战赛：指令解析与融合感知
+# IROS2025 The 3rd Low-Altitude Economy Intelligent Flight Management Challenge
 
 本项目将自然语言导航指令转换为有序目标步骤，并探索利用相机语义与激光雷达几何建立统一的鸟瞰图（BEV）特征。两个模块可独立使用，目前尚未形成端到端导航闭环。
 
