@@ -17,9 +17,7 @@ catkin_ws/scripts/language_parse/
 
 ```
 
-## 第一部分：结构化导航指令解析
-
-### 技术实现
+## 技术实现
 
 解析器默认通过 Ollama 调用 `qwen2.5vl:7b`，使用系统规则、训练集 few-shot 示例和 JSON Schema 约束输出。推理采用 temperature=0、单次请求，生成后严格检查字段、词表和状态一致性；也支持具有 JSON Schema 输出能力的 OpenAI 兼容服务。
 
@@ -48,7 +46,7 @@ catkin_ws/scripts/language_parse/
 
 缺少方向或目标、存在未解决的选择、间隔无单位或冲突时返回 `needs_clarification`。其中可以保留确定步骤供展示，但上层必须先澄清，不能直接执行部分结果。Schema 校验保证输出契约，语义是否忠于原指令仍需标注数据评估。
 
-### 推理使用
+## 推理使用
 
 解析、数据处理和离线测试仅依赖 Python 3.8+ 标准库。模型推理需要已安装并启动的 Ollama 服务及对应模型。从仓库根目录执行：
 
@@ -61,7 +59,7 @@ python3 parse_goal_direction.py '向前走到距离树50厘米的位置'
 
 使用 `--model` 或 `LANGUAGE_PARSE_MODEL` 切换模型，使用 `--base-url` 或 `OLLAMA_BASE_URL` 配置 Ollama 地址，默认地址为 `http://localhost:11434`。成功退出码为 `0`，待澄清为 `2`，请求或输出格式失败为 `1`。
 
-### 数据、LoRA 训练与评估
+## 数据、LoRA 训练与评估
 
 当前数据共 241 条，train / validation / test 分别为 185 / 23 / 33 条，使用随机种子 42，按改写族隔离。同一路线的中英文改写与不同间隔样本归为同族，以减少跨集合泄漏。标签来自规则筛选和手写模板，属于小规模起始数据，正式训练前仍需人工语义审查。
 
